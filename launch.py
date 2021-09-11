@@ -5,16 +5,6 @@ window = tk.Tk()
 
 currentPage = 0
 
-# def toggleText():
-#     global toggled
-#     try:
-#         toggleAble.pack_info()
-#         toggled = False 
-#         toggleAble.pack_forget()
-#     except tk.TclError:
-#         toggled = True 
-#         toggleAble.pack()
-
 def nextPage() -> None:
     global currentPage
 
@@ -23,6 +13,8 @@ def nextPage() -> None:
 
     getLevelFrame.pack_forget()
     getProfileFrame.pack_forget()
+    searchFrame.pack_forget()
+    songVerifyFrame.pack_forget()
 
     if currentPage == 0:
         homeFrame.pack()
@@ -30,6 +22,10 @@ def nextPage() -> None:
         getLevelFrame.pack()
     elif currentPage == 2:
         getProfileFrame.pack()
+    elif currentPage == 3:
+        searchFrame.pack()
+    elif currentPage == 4:
+        songVerifyFrame.pack()
     else:
         currentPage = 0
         homeFrame.pack()
@@ -64,7 +60,7 @@ def getLevel() -> None:
         pass 
 
     levelName = tk.Label(master=getLevelFrame, text=f"{levelData['name']} ({levelData['id']})\n{levelData['author']}")
-    basic = tk.Label(master=getLevelFrame, text=f"{levelData['description']}\n{levelData['songName']}")
+    basic = tk.Label(master=getLevelFrame, text=f"{levelData['description']}\n{levelData['songName']} ({levelData['songID']})")
     further = tk.Label(master=getLevelFrame, text=f"{levelData['stars']} Stars\n{levelData['difficulty']}\n{featured}\n{levelData['length']}\nMade in {levelData['gameVersion']}")
     everythingElse = tk.Label(master=getLevelFrame, text=f"{levelData['downloads']} Downloads\n{levelData['likes']} Likes\nDisliked/Negative: {levelData['disliked']}\nStars Requested: {levelData['starsRequested']}")
 
@@ -99,14 +95,67 @@ def getProfile() -> None:
     try:
         clear('user')
     except NameError:
-        print(NameError)
-        pass 
+        print(NameError) 
 
     username = tk.Label(master=getProfileFrame, text=profileData['username'])
     status = tk.Label(master=getProfileFrame, text=f"{profileData['stars']} Stars\n{profileData['diamonds']} Diamonds\n{profileData['coins']} Coins\n{profileData['userCoins']} User Coins\n{profileData['demons']} Demons\n{profileData['cp']} Creator Points")
 
     username.pack()
     status.pack()
+
+def searchLevel() -> None:
+    global level1
+    global level2
+    global level3
+    global level4
+    global level5 
+
+    search = requests.get(f"https://gdbrowser.com/api/search/{enterSearch.get()}")
+    searchData = json.loads(search.text)
+    # print(searchData[0])
+
+    try:
+        clear('search')
+    except NameError:
+        print(NameError)
+
+    level1 = tk.Label(master=searchFrame, text=f"{searchData[0]['name']} ({searchData[0]['id']})\n{searchData[0]['author']}\n{searchData[0]['description']}\n{searchData[0]['difficulty']}\n{searchData[0]['songName']}\n")
+    level2 = tk.Label(master=searchFrame, text=f"{searchData[1]['name']} ({searchData[1]['id']})\n{searchData[1]['author']}\n{searchData[1]['description']}\n{searchData[1]['difficulty']}\n{searchData[1]['songName']}\n")
+    level3 = tk.Label(master=searchFrame, text=f"{searchData[2]['name']} ({searchData[2]['id']})\n{searchData[1]['author']}\n{searchData[2]['description']}\n{searchData[2]['difficulty']}\n{searchData[2]['songName']}\n")
+    level4 = tk.Label(master=searchFrame, text=f"{searchData[3]['name']} ({searchData[3]['id']})\n{searchData[3]['author']}\n{searchData[3]['description']}\n{searchData[3]['difficulty']}\n{searchData[3]['songName']}\n")
+    level5 = tk.Label(master=searchFrame, text=f"{searchData[3]['name']} ({searchData[3]['id']})\n{searchData[3]['author']}\n{searchData[3]['description']}\n{searchData[3]['difficulty']}\n{searchData[3]['songName']}\n")
+
+    level1.pack()
+    level2.pack()
+    level3.pack()
+    level4.pack()
+    level5.pack()
+
+def checkSong():
+    global isAvailable
+
+    try:
+        clear('songVerify')
+    except NameError:
+        print(NameError)
+
+    print(f"https://gdbrowser.com/api/song/{enterSongId.get()}")
+    checkSongRequest = requests.get(f"https://gdbrowser.com/api/song/{enterSongId.get()}")
+    checkSongRequestData = json.loads(checkSongRequest.text)
+
+    print(checkSongRequestData)
+
+    available = ""
+
+    if checkSongRequestData == -1:
+        available = "Song doesn't exist."
+    elif checkSongRequestData == True:
+        available = "Song is allowed for use."
+    elif checkSongRequestData == False:
+        available = "Song is not allowed for use."
+
+    isAvailable = tk.Label(master=songVerifyFrame, text=f"{available}")
+    isAvailable.pack()
 
 def clear(type: str) -> None:
     global levelName 
@@ -118,6 +167,14 @@ def clear(type: str) -> None:
     global username
     global status
 
+    global level1
+    global level2
+    global level3
+    global level4
+    global level5
+
+    global isAvailable
+
     if type == 'level':
         levelName.pack_forget()
         basic.pack_forget()
@@ -127,6 +184,15 @@ def clear(type: str) -> None:
     elif type == 'user':
         username.pack_forget()
         status.pack_forget()
+    elif type == 'search':
+        level1.pack_forget()
+        level2.pack_forget()
+        level3.pack_forget()
+        level4.pack_forget()
+        level5.pack_forget()
+    elif type == "songVerify":
+        isAvailable.pack_forget()
+        
 
 
 
@@ -155,6 +221,25 @@ requestProfile = tk.Button(master=getProfileFrame, text="Request", command=getPr
 enterUsername.pack()
 requestProfile.pack()
 
+## search frame
+searchFrame = tk.Frame()
+tk.Label(master=searchFrame, text="Search Levels").pack()
+tk.Label(master=searchFrame, text="This feature is in beta! Filters are being worked on.").pack()
+enterSearch = tk.Entry(master=searchFrame, width=50)
+searchButton = tk.Button(master=searchFrame, text="Search", command=searchLevel)
+
+enterSearch.pack()
+searchButton.pack()
+
+## song verification frame
+songVerifyFrame = tk.Frame()
+tk.Label(master=songVerifyFrame, text="Check if Song is available").pack()
+tk.Label(master=songVerifyFrame, text="Enter New Grounds Song ID").pack()
+enterSongId = tk.Entry(master=songVerifyFrame, width=50)
+checkSongButton = tk.Button(master=songVerifyFrame, text="Check", command=checkSong)
+
+enterSongId.pack()
+checkSongButton.pack()
 
 ## base
 tk.Label(
