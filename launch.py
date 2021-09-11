@@ -1,6 +1,11 @@
 import tkinter as tk
 import requests
 import json
+
+print('GDUI 1.0 by sudocode1 and community')
+print('API by GDColon (GDBrowser)')
+print('License: AGPL-3.0')
+
 window = tk.Tk()
 
 currentPage = 0
@@ -41,10 +46,10 @@ def getLevel() -> None:
     global toggleEverythingElseButton
 
     level = requests.get(f"https://gdbrowser.com/api/level/{enterId.get()}")
-    # print(level.text)
+    # # printlevel.text)
 
     levelData = json.loads(level.text)
-    print(levelData)
+    # printlevelData)
 
     featured = 'Not Featured'
 
@@ -90,7 +95,7 @@ def getProfile() -> None:
 
     profile = requests.get(f"https://gdbrowser.com/api/profile/{enterUsername.get()}")
     profileData = json.loads(profile.text)
-    print(profile.text)
+    # print(profile.text)
 
     try:
         clear('user')
@@ -139,11 +144,11 @@ def checkSong():
     except NameError:
         print(NameError)
 
-    print(f"https://gdbrowser.com/api/song/{enterSongId.get()}")
+    # print(f"https://gdbrowser.com/api/song/{enterSongId.get()}")
     checkSongRequest = requests.get(f"https://gdbrowser.com/api/song/{enterSongId.get()}")
     checkSongRequestData = json.loads(checkSongRequest.text)
 
-    print(checkSongRequestData)
+    # print(checkSongRequestData)
 
     available = ""
 
