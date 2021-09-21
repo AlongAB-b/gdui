@@ -2,6 +2,7 @@ import tkinter as tk
 import requests
 import json
 
+print("Hello world")
 print('GDUI 1.0 by sudocode1 and community')
 print('API by GDColon (GDBrowser)')
 print('License: AGPL-3.0')
